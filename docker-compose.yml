@@ -1,0 +1,38 @@
+version: "3.0"
+
+services:
+  webapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        - APP_PORT=8080
+        - APP_NAME=hub-api
+        - APP_PATH=api/hub-api
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - backend
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+
+  postgres:
+    image: postgres:12-alpine
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    restart: always
+    networks:
+      - backend
+    environment:
+      POSTGRES_DB: simple_db
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+    ports:
+      - 5432:5432
+
+networks:
+  backend:
+    driver: bridge
